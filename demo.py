@@ -57,40 +57,51 @@ if not imageFileName:
 ###############################################################################
 
 
-cap = cv2.CaptureFromFile(imageFileName)
+cap = cv2.VideoCapture(imageFileName)
 
+counter = 0
+images = 0
 
-
-
-# cap = cv2.VideoCapture(imageFileName)
-print(cap.isOpened())
-while(cap.isOpened()):
-    print('frame')
+while cap.isOpened():
     ret, frame = cap.read()
 
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    if frame is None:
+        break
 
-    cv2.imshow('frame',gray)
+    images = images + 1
+
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    frame = frame[0:height, int(width / 2):width]
+
+    if images % 2:
+        continue
+
+    hsvImage = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    hsvMask = detectRedInHsv(hsvImage)
+
+    if cv2.countNonZero(hsvMask) > 1200:
+        image = cv2.medianBlur(hsvMask, 5)
+        circles = cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, 1, 50, param1=50, param2=20, minRadius=22, maxRadius=50)
+
+        if circles is not None:
+            # convert the (x, y) coordinates and radius of the circles to integers
+            circles = np.round(circles[0, :]).astype("int")
+
+            for (x, y, r) in circles:
+                cv2.circle(frame, (x, y), r, (0, 255, 0), 4)
+                cv2.rectangle(frame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+
+            cv2.imwrite(imageFileName + '-' + str(counter) + '.png', frame)
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
+    counter += 1
+
 
 cap.release()
 cv2.destroyAllWindows()
 
 
-# cap = cv2.VideoCapture(imageFileName)
-#
-# print(cap)
-#
-# while (cap.isOpened()):
-#     print("fdsfs")
-#     ret, frame = cap.read()
-#
-#     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-#
-#     cv2.imshow('frame',gray)
-#     if cv2.waitKey(1) & 0xFF == ord('q'):
-#         break
-#
-# cap.release()
-# cv2.destroyAllWindows()

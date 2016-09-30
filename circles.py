@@ -37,7 +37,7 @@ output = image.copy() #cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 image = cv2.medianBlur(hsvMask, 5)
 cv2.imshow('segment', image)
 circles = cv2.HoughCircles(image,cv2.HOUGH_GRADIENT,1,50,
-                            param1=50,param2=20,minRadius=0,maxRadius=0)
+                            param1=50,param2=20,minRadius=10,maxRadius=50)
 
 print(circles)
 if circles is not None:
