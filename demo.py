@@ -23,7 +23,7 @@ def detectRedInHsv(image):
 ###############################################################################
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-i", "--file", help = "path to the image")
+ap.add_argument("-f", "--file", help = "path to the image")
 args = vars(ap.parse_args())
 
 imageFileName = args['file']
@@ -68,38 +68,34 @@ while cap.isOpened():
     if frame is None:
         break
 
-    images = images + 1
+    images += 1
 
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
-    frame = frame[0:height, int(width / 2):width]
-
-    if images % 2:
-        continue
+    # if images % 2:
+    #     continue
 
     hsvImage = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     hsvMask = detectRedInHsv(hsvImage)
 
-    if cv2.countNonZero(hsvMask) > 1200:
-        image = cv2.medianBlur(hsvMask, 5)
-        circles = cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, 1, 50, param1=50, param2=20, minRadius=22, maxRadius=50)
+    # if cv2.countNonZero(hsvMask) > 1500:
+    #     image = cv2.medianBlur(hsvMask, 5)
+        # circles = cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, 1, 50, param1=50, param2=20, minRadius=22, maxRadius=50)
+        #
+        # if circles is not None:
+        #     # convert the (x, y) coordinates and radius of the circles to integers
+        #     circles = np.round(circles[0, :]).astype("int")
+        #
+        #     for (x, y, r) in circles:
+        #         cv2.circle(frame, (x, y), r, (0, 255, 0), 4)
+        #         cv2.rectangle(frame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
 
-        if circles is not None:
-            # convert the (x, y) coordinates and radius of the circles to integers
-            circles = np.round(circles[0, :]).astype("int")
-
-            for (x, y, r) in circles:
-                cv2.circle(frame, (x, y), r, (0, 255, 0), 4)
-                cv2.rectangle(frame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-
-            cv2.imwrite(imageFileName + '-' + str(counter) + '.png', frame)
+            # cv2.imwrite("0001-" + str(counter) + '.png', frame)
+            # cv2.imshow('detected', frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
     counter += 1
-
+    cv2.imshow('original', frame)
 
 cap.release()
 cv2.destroyAllWindows()
