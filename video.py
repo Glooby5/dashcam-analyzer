@@ -3,10 +3,20 @@ import sign_detector
 import cv2
 import time
 
+RECTANGLE_WIDTH = 10
+
 
 def detect(filename):
+    print(filename)
     detector = sign_detector.SignDetector()
     cap = cv2.VideoCapture(filename)
+
+    name = filename.split("\\")[-1]
+    name = name[:8]
+    frameCount = 0
+    start = time.time()
+
+
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -14,22 +24,40 @@ def detect(filename):
         if frame is None:
             break
 
+        frameCount += 1
+
+        if not frameCount % 100:
+            currentTime = int(cap.get(cv2.CAP_PROP_POS_MSEC))
+            print(str(currentTime / 1000))
+            print('time:' + str(time.time() - start))
+
+
+        if not frameCount % 3:
+            continue
+
         hsvImage = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         hsvMask = detector.detectRedInHsv(hsvImage)
+        hsvMask = cv2.medianBlur(hsvMask, 3)
 
-        if cv2.countNonZero(hsvMask) > 1200:
+        if cv2.countNonZero(hsvMask) > 1400:
             outputImage = cv2.medianBlur(hsvMask, 5)
             circles = detector.getSignCircles(outputImage)
 
             if circles is None:
-                print("none")
+                if not frameCount % 40:
+                    cv2.imwrite("data/negatives/" + name + "-" + str(frameCount) + ".jpg", frame)
                 continue
 
-            frame = detector.highlightCircles(circles, frame)
+            # frame = detector.highlightCircles(circles, frame)
+            for (x, y, r) in circles:
+                sign = frame[y - r - RECTANGLE_WIDTH:y + r + RECTANGLE_WIDTH, x - r - RECTANGLE_WIDTH: x + r + RECTANGLE_WIDTH]
+                # cv2.imshow('output', sign)
+                cv2.imwrite("data/positives/" + name + "-" + str(frameCount) + ".jpg", sign)
+                # cv2.imwrite("data/positives/originals/" + name + "-" + str(frameCount) + ".jpg", sign)
 
-            cv2.imshow('output', frame)
-            cv2.waitKey(0)
 
+            # cv2.waitKey(0)
+    print('total:' + str(time.time() - start))
 
 ###############################################################################
 
@@ -37,6 +65,14 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-f", "--file", help="path to the video", required=True)
 args = vars(ap.parse_args())
 
-detect(args['file'])
+# listFile = open('data/video/list.txt', 'r')
+
+with open("data/video/list.txt", "r") as ins:
+    array = []
+    for line in ins.readlines():
+        detect('data\\video\\' + line.rstrip())
+
+
+# detect(args['file'])
 
 cv2.destroyAllWindows()

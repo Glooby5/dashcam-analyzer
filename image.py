@@ -9,7 +9,7 @@ def detect(image):
     hsvImage = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     hsvMask = detector.detectRedInHsv(hsvImage)
 
-    outputImage = cv2.medianBlur(hsvMask, 5)
+    outputImage = cv2.medianBlur(hsvMask, 3)
     circles = detector.getSignCircles(outputImage)
     outputImage = detector.highlightCircles(circles, image)
 

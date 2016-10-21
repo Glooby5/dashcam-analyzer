@@ -24,7 +24,7 @@ class SignDetector:
 
     @staticmethod
     def getSignCircles(image):
-        circles = cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, 1, 50, param1=50, param2=20, minRadius=22, maxRadius=50)
+        circles = cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, 1, 50, param1=50, param2=20, minRadius=25, maxRadius=50)
 
         if circles is not None:
             circles = np.round(circles[0, :]).astype("int")
