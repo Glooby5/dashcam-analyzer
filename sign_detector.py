@@ -3,6 +3,8 @@ import cv2
 
 
 class SignDetector:
+    RECTANGLE_WIDTH = 10
+    COLOR_THRESHOLD = 1400
 
     @staticmethod
     def detectRedInRgb(image):
@@ -43,3 +45,27 @@ class SignDetector:
             cv2.rectangle(image, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
 
         return image
+
+    def getSignsFromCircles(self, frame, circles):
+        if circles is None:
+            return None
+
+        signs = []
+
+        for (x, y, r) in circles:
+            signs.append(frame[y - r - self.RECTANGLE_WIDTH:y + r + self.RECTANGLE_WIDTH, x - r - self.RECTANGLE_WIDTH: x + r + self.RECTANGLE_WIDTH])
+
+        return signs
+
+    def getSignsFromFrame(self, frame):
+        hsvImage = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        hsvMask = self.detectRedInHsv(hsvImage)
+        # hsvMask = cv2.medianBlur(hsvMask, 3)
+
+        if cv2.countNonZero(hsvMask) < self.COLOR_THRESHOLD:
+            return None
+
+        outputImage = cv2.medianBlur(hsvMask, 5)
+        circles = self.getSignCircles(outputImage)
+
+        return self.getSignsFromCircles(frame, circles)
