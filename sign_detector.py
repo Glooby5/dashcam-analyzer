@@ -15,7 +15,7 @@ class SignDetector:
 
     @staticmethod
     def detectRedInHsv(image):
-        lower = np.array([150, 70, 70], dtype=np.uint8)
+        lower = np.array([150, 45, 45], dtype=np.uint8)
         upper = np.array([210, 255, 255], dtype=np.uint8)
 
         mask = cv2.inRange(image, lower, upper)
