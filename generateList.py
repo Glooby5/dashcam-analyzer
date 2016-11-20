@@ -35,7 +35,7 @@ def resizeImages(path, newWidth, newHeight):
         if height < newHeight:
             continue
 
-        resized = cv2.resize(image, (1280, 720))
+        resized = cv2.resize(image, (newWidth, newHeight))
         cv2.imwrite(path + '/' + imageFileName, resized)
 
 
