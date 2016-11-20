@@ -1,7 +1,9 @@
 import argparse
-import data_generator
-import cv2
 import os
+
+import cv2
+
+from src.lib import data_generator
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-f", "--file", help="path to the video", required=True)

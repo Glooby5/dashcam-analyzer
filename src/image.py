@@ -1,6 +1,8 @@
 import argparse
-import sign_detector
+
 import cv2
+
+from src.lib import sign_detector
 
 
 def detect(image):

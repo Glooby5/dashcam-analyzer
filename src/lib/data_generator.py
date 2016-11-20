@@ -1,6 +1,8 @@
-import cv2
-import sign_detector
 import time
+
+import cv2
+
+from src.lib import sign_detector
 
 
 class DataGenerator:
