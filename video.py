@@ -1,42 +1,24 @@
 import argparse
-import sign_detector
+import data_generator
 import cv2
-import time
-
-
-def detect(filename):
-    detector = sign_detector.SignDetector()
-    cap = cv2.VideoCapture(filename)
-
-    while cap.isOpened():
-        ret, frame = cap.read()
-
-        if frame is None:
-            break
-
-        hsvImage = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        hsvMask = detector.detectRedInHsv(hsvImage)
-
-        if cv2.countNonZero(hsvMask) > 1200:
-            outputImage = cv2.medianBlur(hsvMask, 5)
-            circles = detector.getSignCircles(outputImage)
-
-            if circles is None:
-                print("none")
-                continue
-
-            frame = detector.highlightCircles(circles, frame)
-
-            cv2.imshow('output', frame)
-            cv2.waitKey(0)
-
-
-###############################################################################
+import os
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-f", "--file", help="path to the video", required=True)
+ap.add_argument("-p", "--positives", help="path to positives folder", default="data/positives")
+ap.add_argument("-n", "--negatives", help="path to negatives folder", default="data/negatives")
 args = vars(ap.parse_args())
 
-detect(args['file'])
+
+with open(args['file'], "r") as ins:
+    for line in ins.readlines():
+        print("Reading: " + line)
+
+        generator = data_generator.DataGenerator(line.rstrip(), args['positives'], args['negatives'])
+        totalTime = generator.generate()
+
+        print("Positives: " + str(generator.positives))
+        print("Negatives: " + str(generator.negatives))
+        print('Total time:' + str(totalTime) + os.linesep)
 
 cv2.destroyAllWindows()
