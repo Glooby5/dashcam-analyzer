@@ -29,9 +29,16 @@ while 1:
         if w > MAX_WIDTH or h > MAX_WIDTH:
             continue
 
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
+        if w < 0 or h < 0:
+            continue
 
-    cv2.imshow('img', frame)
+        #print(str(x) + ':' + str(y) + ' - ' + str(w) + ':' + str(h))
+        #cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 0), 2)
+
+        #ßcv2.imshow('img', frame[y:y + h, x:x + h])
+    #/cv2.imshow('test', frame)
+        cv2.imwrite('out/sign' + str(frameCount) + '.jpg', frame[y:y + h, x:x + h])
+
     k = cv2.waitKey(30) & 0xff
     frameCount += 1
 
