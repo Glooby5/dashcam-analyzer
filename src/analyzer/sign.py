@@ -5,33 +5,48 @@ import numpy as np
 class Sign:
 
     def __init__(self, image):
-        self.image = image
-        self.height, self.width = image.shape[:2]
+        self._set_image(image)
 
-    def _crop_sign(self):
+    def crop_sign(self):
+        """Tries to crop selection in sign only with interesting area"""
+
         gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
         threshold_image = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 15, 1)
         im2, contours, hierarchy = cv2.findContours(threshold_image.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
         for contour in contours:
-            if self._get_area_size(contour) < 20:
-                continue
+            if self._process_contour(contour):
+                break
 
-            [x, y, w, h] = cv2.boundingRect(contour)
+    def _process_contour(self, contour):
+        if self._get_area_size(contour) < 20:
+            return False
 
-            if self.width <= w or self.height <= h:
-                continue
+        [x, y, w, h] = cv2.boundingRect(contour)
 
-            if h < 20:
-                continue
+        if self.width <= w or self.height <= h:
+            return False
 
-            mask = self._get_circle_mask(contour)
+        if h < 20:
+            return False
 
-            result = np.bitwise_and(self.image, mask)
-            result = self._concat(result, mask)
+        self._set_sign_from_contour(contour, h, w, x, y)
 
-            self.image = result[y:y + h, x:x + w]
-            break
+        return True
+
+    def _set_sign_from_contour(self, contour, h, w, x, y):
+        """Set sign selection according to given contour"""
+
+        mask = self._get_circle_mask(contour)
+
+        result = np.bitwise_and(self.image, mask)
+        result = self._concat(result, mask)
+
+        self._set_image(result[y:y + h, x:x + w])
+
+    def _set_image(self, image):
+        self.image = image
+        self.height, self.width = image.shape[:2]
 
     def _get_area_size(self, contour):
         area = cv2.contourArea(contour)
@@ -40,6 +55,8 @@ class Sign:
         return area_percent
 
     def _get_circle_mask(self, contour):
+        """Get mask image of contour"""
+
         (x, y), radius = cv2.minEnclosingCircle(contour)
 
         center = (int(x), int(y))
@@ -53,6 +70,8 @@ class Sign:
         return mask
 
     def _concat(self, img2, mask):
+        """Get sign selection by mask on black backgroud"""
+
         blank = np.zeros_like(self.image)
         blank = cv2.bitwise_not(blank)
 
@@ -66,4 +85,5 @@ class Sign:
 
         dst = cv2.add(img1_bg, img2_fg)
         blank[0:rows, 0:cols] = dst
+
         return blank

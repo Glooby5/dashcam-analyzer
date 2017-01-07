@@ -1,4 +1,4 @@
-from src.analyzer.sign import Sign
+from .sign import Sign
 
 
 class Frame:
