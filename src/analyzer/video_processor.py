@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 from .frame import Frame
 
 MAX_WIDTH = 150
@@ -9,6 +10,7 @@ class VideoProcessor:
         self.video = cv2.VideoCapture(video_file_name)
         self.cascade = cv2.CascadeClassifier(cascade_file_name)
         self.frame_number = 0
+        self._initialize_knn_model()
 
     def get_next(self):
         ret, image = self.video.read()
@@ -36,3 +38,11 @@ class VideoProcessor:
             return frame
 
         return None
+
+    def _initialize_knn_model(self):
+        samples = np.loadtxt('general-samples.data', np.float32)
+        responses = np.loadtxt('general-responses.data', np.float32)
+        responses = responses.reshape((responses.size, 1))
+
+        self.knn_model = cv2.ml.KNearest_create()
+        self.knn_model.train(samples, cv2.ml.ROW_SAMPLE, responses)

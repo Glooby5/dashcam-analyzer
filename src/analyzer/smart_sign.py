@@ -1,20 +1,36 @@
 import cv2
-import numpy as np
+from .blob import Blob
 
 
 class SmartSign:
 
-    def __init__(self, sign):
+    def __init__(self, sign, knn_model):
+        self.knn_model = knn_model
         self.sign = sign
         self.width = sign.width
         self.height = sign.height
-        self._initialize_knn_model()
         self.value = None
 
     def classify(self):
-        digit_contours, thresh = self._get_contours(self.sign.image)
-        previous = None
+        blobs = self._get_blobs()
+        blobs = sorted(blobs, key=lambda blob: blob.x)
+
         value = ""
+
+        for blob in blobs:
+            value += str(blob.get_value())
+
+        try:
+            self.value = int(value)
+        except ValueError:
+            return None
+
+        return self.value
+
+    def _get_blobs(self):
+        digit_contours, thresh = self._get_contours(self.sign.image)
+        blobs = []
+        previous = None
 
         for contour in digit_contours:
 
@@ -22,13 +38,11 @@ class SmartSign:
                 continue
 
             [x, y, w, h] = cv2.boundingRect(contour)
+            blob_image = thresh[y:y + h, x:x + w]
 
-            blob = thresh[y:y + h, x:x + w]
-            value = value + self._get_digit_value(blob)
+            blobs.append(Blob(blob_image, [x, y, w, h], self.knn_model))
 
-        self.value = int(value)
-
-        return value
+        return blobs
 
     def _is_blob(self, contour, previous):
         if cv2.contourArea(contour) < 50:
@@ -55,24 +69,6 @@ class SmartSign:
                 return False
 
         return True
-
-    def _initialize_knn_model(self):
-        samples = np.loadtxt('general-samples.data', np.float32)
-        responses = np.loadtxt('general-responses.data', np.float32)
-        responses = responses.reshape((responses.size, 1))
-
-        self.knn_model = cv2.ml.KNearest_create()
-        self.knn_model.train(samples, cv2.ml.ROW_SAMPLE, responses)
-
-    def _get_digit_value(self, image):
-        roi = image
-        roi_small = cv2.resize(roi, (10, 10))
-        roi_small = roi_small.reshape((1, 100))
-        roi_small = np.float32(roi_small)
-
-        retval, results, neigh_resp, dists = self.knn_model.findNearest(roi_small, k=5)
-
-        return str(int((results[0][0])))
 
     def _get_contours(self, image):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

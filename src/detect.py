@@ -1,6 +1,7 @@
 import cv2
 import argparse
 from analyzer import video_processor
+from analyzer import smart_sign
 
 MAX_WIDTH = 150
 
@@ -26,6 +27,12 @@ while 1:
 
     for sign in frame.signs:
         cv2.imshow("sign", sign.image)
+
+        sign.crop_sign()
+        classify_sign = smart_sign.SmartSign(sign, video_processor.knn_model)
+        classify_sign.classify()
+
+        print("value: " + str(classify_sign.value))
 
         k = cv2.waitKey(0)
 
