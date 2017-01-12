@@ -40,12 +40,17 @@ class SmartSign:
             [x, y, w, h] = cv2.boundingRect(contour)
             blob_image = thresh[y:y + h, x:x + w]
 
+            percent = 100 * cv2.countNonZero(cv2.bitwise_not(blob_image)) / (w * h)
+
+            if percent < 20: # hotfix for irelevant contour detect
+                continue
+
             blobs.append(Blob(blob_image, [x, y, w, h], self.knn_model))
 
         return blobs
 
     def _is_blob(self, contour, previous):
-        if cv2.contourArea(contour) < 50:
+        if cv2.contourArea(contour) < 80:
             return False
 
         [x, y, w, h] = cv2.boundingRect(contour)
@@ -74,6 +79,8 @@ class SmartSign:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         ret, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
-        im2, contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        im2, contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+
+        cv2.imshow("image", thresh)
 
         return contours, thresh

@@ -2,6 +2,7 @@ import cv2
 import argparse
 from analyzer import video_processor
 from analyzer import smart_sign
+import time
 
 MAX_WIDTH = 150
 
@@ -13,28 +14,36 @@ args = vars(ap.parse_args())
 video_processor = video_processor.VideoProcessor(args['file'], args['video'])
 k = None
 
-while 1:
+while True:
     frame = video_processor.get_next()
 
     if frame is False:
         break
 
-    if frame is None:
-        continue
+    frame_image = video_processor.actual_frame.image
 
-    if len(frame.signs) == 0:
-        continue
+    if frame is not None:
 
-    for sign in frame.signs:
-        cv2.imshow("sign", sign.image)
+        if len(frame.signs) == 0:
+            continue
 
-        sign.crop_sign()
-        classify_sign = smart_sign.SmartSign(sign, video_processor.knn_model)
-        classify_sign.classify()
+        for sign in frame.signs:
+            sign.crop_sign()
+            [x, y, w, h] = sign.position
 
-        print("value: " + str(classify_sign.value))
+            classify_sign = smart_sign.SmartSign(sign, video_processor.knn_model)
+            classify_sign.classify()
 
-        k = cv2.waitKey(0)
+            cv2.rectangle(frame_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+            if classify_sign.value is not None:
+                cv2.putText(frame_image, str(classify_sign.value), (x + 5, y + h + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (46, 255, 0), 3)
+
+    cv2.imshow("frame_image", frame_image)
+    k = cv2.waitKey(1)
+
+    if frame and len(frame.signs):
+        time.sleep(0.05)
 
     if k == 27:
         break

@@ -11,6 +11,7 @@ class VideoProcessor:
         self.cascade = cv2.CascadeClassifier(cascade_file_name)
         self.frame_number = 0
         self._initialize_knn_model()
+        self.actual_frame = None
 
     def get_next(self):
         ret, image = self.video.read()
@@ -23,6 +24,7 @@ class VideoProcessor:
             return None
 
         frame = Frame(image)
+        self.actual_frame = frame
 
         sign_hits = self.cascade.detectMultiScale(image, scaleFactor=1.3, minNeighbors=2, minSize=(20, 20))
 

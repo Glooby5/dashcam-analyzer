@@ -4,8 +4,9 @@ import numpy as np
 
 class Sign:
 
-    def __init__(self, image):
+    def __init__(self, image, position):
         self._set_image(image)
+        self.position = position
 
     def crop_sign(self):
         """Tries to crop selection in sign only with interesting area"""

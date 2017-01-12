@@ -8,6 +8,6 @@ class Frame:
 
     def add_sign(self, position):
         [x, y, w, h] = position
-        sign = Sign(self.image[y:y + h, x:x + w])
+        sign = Sign(self.image[y:y + h, x:x + w], position)
 
         self.signs.append(sign)
