@@ -35,7 +35,7 @@ class VideoProcessor:
             if w < 0 or h < 0:
                 continue
 
-            frame.add_sign([x, y, w, h])
+            frame.add_sign([x, y, w, h], self.knn_model)
 
         return frame
 

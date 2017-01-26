@@ -84,3 +84,6 @@ class SmartSign:
         cv2.imshow("image", thresh)
 
         return contours, thresh
+
+    def get_position(self):
+        return self.sign.position
