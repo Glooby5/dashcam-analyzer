@@ -22,22 +22,20 @@ while True:
 
     frame_image = video_processor.actual_frame.image
 
-    if frame is not None:
+    if frame is None:
+        continue
 
-        if len(frame.signs) == 0:
-            continue
+    for sign in frame.signs:
+        sign.crop_sign()
+        [x, y, w, h] = sign.position
 
-        for sign in frame.signs:
-            sign.crop_sign()
-            [x, y, w, h] = sign.position
+        classify_sign = smart_sign.SmartSign(sign, video_processor.knn_model)
+        classify_sign.classify()
 
-            classify_sign = smart_sign.SmartSign(sign, video_processor.knn_model)
-            classify_sign.classify()
+        cv2.rectangle(frame_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-            cv2.rectangle(frame_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-            if classify_sign.value is not None:
-                cv2.putText(frame_image, str(classify_sign.value), (x + 5, y + h + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (46, 255, 0), 3)
+        if classify_sign.value is not None:
+            cv2.putText(frame_image, str(classify_sign.value), (x + 5, y + h + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (46, 255, 0), 3)
 
     cv2.imshow("frame_image", frame_image)
     k = cv2.waitKey(1)

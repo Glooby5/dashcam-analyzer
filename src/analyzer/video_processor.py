@@ -37,9 +37,7 @@ class VideoProcessor:
 
             frame.add_sign([x, y, w, h])
 
-            return frame
-
-        return None
+        return frame
 
     def _initialize_knn_model(self):
         samples = np.loadtxt('general-samples.data', np.float32)
