@@ -1,8 +1,6 @@
 import cv2
 import argparse
 from analyzer import video_processor
-from analyzer import smart_sign
-import time
 
 MAX_WIDTH = 150
 
@@ -37,8 +35,4 @@ while True:
     cv2.imshow("frame_image", frame_image)
     k = cv2.waitKey(1)
 
-    if frame and len(frame.signs):
-        time.sleep(0.05)
-
-    if k == 27:
-        break
+cv2.destroyAllWindows()

@@ -8,3 +8,7 @@
  
 ## Detekce
  - `python detect.py -f="cascade.xml" -v="video.mp4"`
+
+## Vytvoření videa
+
+ - `video = cv2.VideoWriter('video.avi', cv2.VideoWriter_fourcc(*'XVID'),15,(1280,720))`

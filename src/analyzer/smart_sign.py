@@ -22,10 +22,21 @@ class SmartSign:
 
         try:
             self.value = int(value)
+            self._normalize_value()
         except ValueError:
             return None
 
         return self.value
+
+    def _normalize_value(self):
+        if self.value > 150:
+            self.value = int(str(self.value)[:-1])
+
+        if self.value % 5:
+            self.value = None
+
+        if self.value == 0:
+            self.value = None
 
     def _get_blobs(self):
         digit_contours, thresh = self._get_contours(self.sign.image)
@@ -87,3 +98,9 @@ class SmartSign:
 
     def get_position(self):
         return self.sign.position
+
+    def set_position(self, position):
+        self.sign.position = position
+
+    def set_value(self, value):
+        self.value = value
