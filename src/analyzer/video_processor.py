@@ -46,12 +46,15 @@ class VideoProcessor:
 
     def check_frame_signs(self, frame):
 
-        if len(frame.signs) > 0 or len(self.frame_deque) <= 1:
+        if len(self.frame_deque) <= 1:
             return
 
         previous_frame = self.frame_deque[0]
 
-        if self.frame_deque[0].fake or len(previous_frame.signs):
+        if self.frame_deque[0].fake or len(frame.signs) >= len(previous_frame.signs):
+            return
+
+        if len(previous_frame.signs) == 0:
             return
 
         for sign in previous_frame.signs:
