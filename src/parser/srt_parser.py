@@ -4,13 +4,16 @@ import re
 
 class SrtParser:
 
-    def parse(self, file):
+    def __init__(self, file):
+        self.file = file
+
+    def parse(self):
         line_count = 0
         record_number = None
         time = None
         gps = None
 
-        for line in file:
+        for line in self.file:
             if line_count == 0:
                 m = re.search('\d+', line)
                 record_number = m.group(0)
@@ -33,9 +36,19 @@ class SrtParser:
             record = Record()
             record.start = time[0]
             record.latitude = gps[0]
-            record.longitude = gps[1]
+            record.longtitude = gps[1]
+            record.set_time(record.start)
+            line_count = 0
 
             yield record
+
+        record = Record()
+        record.start = time[0]
+        record.latitude = gps[0]
+        record.longtitude = gps[1]
+        record.set_time(record.start)
+
+        return record
 
     def check_values(self, record_number, time, gps):
         if record_number is None:

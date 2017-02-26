@@ -8,6 +8,7 @@ class Frame:
         self.number = number
         self.signs = []
         self.fake = False
+        self.time = None
 
     def add_sign(self, position, knn_model):
         [x, y, w, h] = position

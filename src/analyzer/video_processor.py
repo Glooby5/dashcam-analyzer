@@ -24,6 +24,7 @@ class VideoProcessor:
             return False
 
         frame = Frame(image, self.frame_counter)
+        frame.time = self.video.get(cv2.CAP_PROP_POS_MSEC) / 1000
         self.actual_frame = frame
 
         sign_hits = self.cascade.detectMultiScale(image, scaleFactor=1.3, minNeighbors=2, minSize=(20, 20))
