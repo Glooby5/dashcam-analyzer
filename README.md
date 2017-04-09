@@ -1,6 +1,13 @@
 # Analýza záznamu palubní kamery vozidla
- - detekce značek omezujících rychlost
- - upozornění na místa s pravděpodobným překročením rychlosti
+ - detekce zákazových dopravních značek
+ - zmapování pokrytí dopravního značení na základě videozáznamu s dostupnými GPS daty
+ 
+![Mapa dopravního značení](/excel/images/mapa.png)
+
+## Excel@FIT
+ - v rámci přípravy bakalářské práce vznikl krátký článek do soutěže [Excel@FIT](http://excel.fit.vutbr.cz) 
+ - [PDF k nahlednutí](excel/excel-dashcam-analyzer-xkader13.pdf) 
+
  
 ## Trénování
  - `opencv_createsamples -info info.dat -nuum 440 -w 50 -h 50 -vec samples.vec -maxxangle 0.5 -maxyangle 0.5 -maxzangle 0.5`
