@@ -92,7 +92,6 @@ class SmartSign:
         ret, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
         im2, contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
 
-        cv2.imshow("image", thresh)
 
         return contours, thresh
 

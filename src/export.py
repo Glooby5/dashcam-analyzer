@@ -4,6 +4,7 @@ from analyzer import video_processor
 from collections import deque
 from parser import srt_parser
 import csv
+import time
 
 MAX_WIDTH = 150
 
@@ -74,6 +75,7 @@ def has_next_n():
 
     return False
 
+start = time.time()
 
 while True:
     frame = video_processor.get_next()
@@ -84,5 +86,7 @@ while True:
         break
 
     frames.append(frame)
+
+print("elapsed" + str(time.time() - start))
 
 csvfile.close()
