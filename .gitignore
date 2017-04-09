@@ -2,3 +2,4 @@
 data
 *.jpg
 *.png
+!excel/images/*.png
