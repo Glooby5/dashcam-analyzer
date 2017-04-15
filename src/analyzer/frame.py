@@ -1,5 +1,6 @@
-from sign import Sign
+from .sign import Sign
 from .smart_sign import SmartSign
+from .type_sign import TypeSign
 
 
 class Frame:
@@ -10,10 +11,16 @@ class Frame:
         self.fake = False
         self.time = None
 
-    def add_sign(self, position, knn_model):
+    def add_sign(self, position, knn_type_model, knn_model):
         [x, y, w, h] = position
         sign = Sign(self.image[y:y + h, x:x + w], position)
         sign.crop_sign()
+
+        type_sign = TypeSign(sign, knn_type_model)
+        self.signs.append(type_sign)
+
+        if type_sign.type is not 6:
+            return type_sign
 
         classify_sign = SmartSign(sign, knn_model)
         classify_sign.classify()

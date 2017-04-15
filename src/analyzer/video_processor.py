@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from .frame import Frame
+from .smart_sign import SmartSign
 from collections import deque
 import copy
 
@@ -14,6 +15,7 @@ class VideoProcessor:
         self.frame_number = 0
         self.frame_counter = 0
         self._initialize_knn_model()
+        self._initialize_type_knn_model()
         self.actual_frame = None
         self.frame_deque = deque(maxlen=5)
 
@@ -36,7 +38,11 @@ class VideoProcessor:
             if w < 0 or h < 0:
                 continue
 
-            sign = frame.add_sign([x, y, w, h], self.knn_model)
+            sign = frame.add_sign([x, y, w, h], self.type_knn_model, self.knn_model)
+
+            if isinstance(sign, SmartSign) is False:
+                continue
+
             self.check_sign_value(frame, sign, [x, y, w, h])
 
         self.check_frame_signs(frame)
@@ -106,3 +112,11 @@ class VideoProcessor:
 
         self.knn_model = cv2.ml.KNearest_create()
         self.knn_model.train(samples, cv2.ml.ROW_SAMPLE, responses)
+
+    def _initialize_type_knn_model(self):
+        samples = np.loadtxt('sign-classification-samples.data', np.float32)
+        responses = np.loadtxt('sign-classification-responses.data', np.float32)
+        responses = responses.reshape((responses.size, 1))
+
+        self.type_knn_model = cv2.ml.KNearest_create()
+        self.type_knn_model.train(samples, cv2.ml.ROW_SAMPLE, responses)

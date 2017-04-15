@@ -1,6 +1,8 @@
 import cv2
 import argparse
 from analyzer import video_processor
+from analyzer import type_sign
+import os
 
 MAX_WIDTH = 150
 
@@ -23,14 +25,27 @@ while True:
     if frame is None:
         continue
 
+    if frame.number % 4:
+        continue
+
     for sign in frame.signs:
 
         [x, y, w, h] = sign.get_position()
 
-        cv2.rectangle(frame_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # cv2.rectangle(frame_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
         if sign.value is not None:
             cv2.putText(frame_image, str(sign.value), (x + 5, y + h + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (46, 255, 0), 3)
+
+        if isinstance(sign, type_sign.TypeSign):
+            cv2.putText(frame_image, sign.mapping[sign.type], (x + 5, y + h + 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (46, 255, 0), 3)
+
+            directory = 'export/' + sign.mapping[sign.type]
+
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
+            cv2.imwrite(directory + '/sign' + str(frame.number) + '.jpg', sign.sign.original)
 
     cv2.imshow("frame_image", frame_image)
     k = cv2.waitKey(1)

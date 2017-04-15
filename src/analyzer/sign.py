@@ -1,19 +1,20 @@
 import cv2
 import numpy as np
+from .threshold_sign import ThresholdSign
 
 
 class Sign:
 
     def __init__(self, image, position):
+        self.original = image
         self._set_image(image)
         self.position = position
 
     def crop_sign(self):
         """Tries to crop selection in sign only with interesting area"""
+        threshold_sign = ThresholdSign(self.image)
 
-        gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
-        threshold_image = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 15, 1)
-        im2, contours, hierarchy = cv2.findContours(threshold_image.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        im2, contours, hierarchy = cv2.findContours(threshold_sign.get_result(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
         for contour in contours:
             if self._process_contour(contour):
