@@ -1,4 +1,4 @@
-from .sign import Sign
+from sign import Sign
 from .smart_sign import SmartSign
 
 

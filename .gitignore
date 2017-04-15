@@ -1,5 +1,5 @@
 .idea
-data
+/data
 *.jpg
 *.png
 !excel/images/*.png

@@ -27,7 +27,7 @@ class VideoProcessor:
         frame.time = self.video.get(cv2.CAP_PROP_POS_MSEC) / 1000
         self.actual_frame = frame
 
-        sign_hits = self.cascade.detectMultiScale(image, scaleFactor=1.3, minNeighbors=2, minSize=(20, 20))
+        sign_hits = self.cascade.detectMultiScale(image, scaleFactor=1.2, minNeighbors=2, minSize=(20, 20))
 
         for (x, y, w, h) in sign_hits:
             if w > MAX_WIDTH or h > MAX_WIDTH:
