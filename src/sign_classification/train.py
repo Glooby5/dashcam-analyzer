@@ -6,6 +6,7 @@ import os.path
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)) + '/analyzer')
 import threshold_sign
+import crop_sign
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-d", "--dataset", help="path to dataset file", required=True)
@@ -24,7 +25,10 @@ mapping = {
     7: "stani",
     8: "vlevo",
     9: "vpravo",
-    10: "zastaveni"
+    10: "zastaveni",
+    11: "vjezd",
+    12: "zuzeni",
+    13: "hmotnost"
 }
 
 mapping_write = {v: k for k, v in mapping.items()}
@@ -39,9 +43,18 @@ with open(args['dataset'], "r") as ins:
         if image is None:
             continue
 
-        sign = threshold_sign.ThresholdSign(image)
+        cropped_sign = crop_sign.CropSign(image)
 
-        sample = sign.calculate_features()
+        cv2.imshow("crop", cropped_sign.image)
+
+        sign = threshold_sign.ThresholdSign(image)
+        cv2.imshow("oldsign", sign.get_result())
+
+        th_sign = threshold_sign.ThresholdSign(cropped_sign.image)
+        cv2.imshow("newsign", th_sign.get_result())
+        # cv2.waitKey(0)
+
+        sample = th_sign.calculate_features()
         samples = np.append(samples, sample, 0)
         responses.append(mapping_write[dir_class])
 

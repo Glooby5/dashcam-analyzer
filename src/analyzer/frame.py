@@ -17,9 +17,9 @@ class Frame:
         sign.crop_sign()
 
         type_sign = TypeSign(sign, knn_type_model)
-        self.signs.append(type_sign)
 
-        if type_sign.type is not 6:
+        if type_sign.type != 6:
+            self.signs.append(type_sign)
             return type_sign
 
         classify_sign = SmartSign(sign, knn_model)

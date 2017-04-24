@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from .threshold_sign import ThresholdSign
+# from threshold_sign import ThresholdSign
 
 
 class Sign:

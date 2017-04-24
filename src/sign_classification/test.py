@@ -6,6 +6,7 @@ import os.path
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)) + '/analyzer')
 import threshold_sign
+import crop_sign
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-d", "--dataset", help="path to dataset file", required=True)
@@ -21,6 +22,7 @@ model.train(samples, cv2.ml.ROW_SAMPLE, responses)
 all = 0
 correct = 0
 incorrect = 0
+unknown = 0
 
 mapping = {
     1: "chodci",
@@ -53,11 +55,22 @@ with open(args['dataset'], "r") as ins:
         sign = threshold_sign.ThresholdSign(image)
         roi_small = sign.calculate_features()
 
-        retval, results, neigh_resp, dists = model.findNearest(roi_small, k=3)
+        cropped_sign = crop_sign.CropSign(image)
+        th_sign = threshold_sign.ThresholdSign(cropped_sign.image)
+
+        roi_small = th_sign.calculate_features()
+
+        retval, results, neigh_resp, dists = model.findNearest(roi_small, k=2)
 
         print("nalezeno  : " + str(retval) + " : " + str(neigh_resp) + " : " + str(dists))
 
+        cv2.waitKey(0)
+
         all += 1
+
+        if dists[0][0] > 12000000:
+            unknown += 1
+            # cv2.waitKey(0)
 
         if retval == mapping_write[dir_class]:
             correct += 1
@@ -66,4 +79,4 @@ with open(args['dataset'], "r") as ins:
 
 acurracy = 100 * correct / all
 
-print(str(acurracy) + ":" + str(all) + ":" + str(correct) + ":" + str(incorrect))
+print(str(acurracy) + ":" + str(all) + ":" + str(correct) + ":" + str(incorrect)+ ":" + str(unknown))

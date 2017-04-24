@@ -19,23 +19,42 @@ class VideoProcessor:
         self.actual_frame = None
         self.frame_deque = deque(maxlen=5)
 
-    def get_next(self):
-        ret, image = self.video.read()
+    def _get_image(self):
+        while True:
+            ret, image = self.video.read()
 
-        if ret is False:
+            if ret is False:
+                return False
+
+            # if self.frame_counter % 3:
+            #     self.frame_counter += 1
+            #     continue
+
+            return image
+
+    def get_next(self):
+        image = self._get_image()
+
+        if image is False:
             return False
 
         frame = Frame(image, self.frame_counter)
+
         frame.time = self.video.get(cv2.CAP_PROP_POS_MSEC) / 1000
         self.actual_frame = frame
 
-        sign_hits = self.cascade.detectMultiScale(image, scaleFactor=1.2, minNeighbors=2, minSize=(20, 20))
+
+
+        sign_hits = self.cascade.detectMultiScale(image, scaleFactor=1.3, minNeighbors=2, minSize=(20, 20))
 
         for (x, y, w, h) in sign_hits:
             if w > MAX_WIDTH or h > MAX_WIDTH:
                 continue
 
             if w < 0 or h < 0:
+                continue
+
+            if h < 51:
                 continue
 
             sign = frame.add_sign([x, y, w, h], self.type_knn_model, self.knn_model)

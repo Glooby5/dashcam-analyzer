@@ -22,17 +22,24 @@ class SrtParser:
                 time = re.findall(r"\d{2}:\d{2}:\d{2},\d{3}", line)
 
             elif line_count == 3:
-                gps = re.findall(r"\d+,\d+", line)
+                print(line)
+                gps = re.findall(r"\d+\,\d+", line)
+                print(gps)
 
             line_count += 1
 
             if line != "\n":
                 continue
 
+            print("check")
+            print(gps)
             if self.check_values(record_number, time, gps) is False:
                 line_count = 0
+                print("next")
                 continue
 
+            print(gps)
+            print("save")
             record = Record()
             record.start = time[0]
             record.latitude = gps[0]
@@ -42,6 +49,7 @@ class SrtParser:
 
             yield record
 
+        print(gps)
         record = Record()
         record.start = time[0]
         record.latitude = gps[0]
@@ -54,10 +62,18 @@ class SrtParser:
         if record_number is None:
             return False
 
+        print("record_number")
+
         if len(time) != 2:
             return False
 
+        print("time")
+        print(gps)
+        print("gps2")
+
         if len(gps) != 2:
             return False
+
+        print("gps")
 
         return True
