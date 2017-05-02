@@ -1,0 +1,7 @@
+sudo: false
+language: "python"
+cache: "pip"
+python:
+  - "3.5"
+script:
+  - "python src/parser/tests/srt_parser_test.py"
