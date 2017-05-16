@@ -45,13 +45,9 @@ with open(args['dataset'], "r") as ins:
 
         cropped_sign = crop_sign.CropSign(image)
 
-        cv2.imshow("crop", cropped_sign.image)
-
         sign = threshold_sign.ThresholdSign(image)
-        cv2.imshow("oldsign", sign.get_result())
 
         th_sign = threshold_sign.ThresholdSign(cropped_sign.image)
-        cv2.imshow("newsign", th_sign.get_result())
         # cv2.waitKey(0)
 
         sample = th_sign.calculate_features()

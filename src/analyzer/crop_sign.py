@@ -4,6 +4,7 @@ from .threshold_sign import ThresholdSign
 
 
 class CropSign:
+    """ Represents cropped sign image"""
 
     def __init__(self, image):
         self.image = image

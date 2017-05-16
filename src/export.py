@@ -2,10 +2,12 @@ import cv2
 import argparse
 from analyzer import video_processor
 from collections import deque
-from parser import srt_parser
+from parser.srtparser import srt_parser
+# from parser import srtparser
 import csv
 import time
 from analyzer import smart_sign
+from analyzer import type_sign
 import os
 
 MAX_WIDTH = 150
@@ -56,6 +58,11 @@ def export_sign():
     if len(frames) < 10:
         return
 
+    last_frames = 0
+    frame_image = frames[8].image
+    cv2.imshow("frame_image", frame_image)
+    cv2.waitKey(1)
+
     #chtělo by to všechno posunout dopředu abych mohl porvnávat i zpětně,mít 9 framů a kontrolovat to na otm uprostřed
     if len(frames[9].signs) == 0 and len(frames[8].signs) > 0:
 
@@ -63,6 +70,7 @@ def export_sign():
             return
 
         exported = []
+
 
         for i, sign in enumerate(frames[8].signs):
             srt_record = get_srt_record(frame.time)
@@ -90,12 +98,33 @@ def export_sign():
 
             filename = '/sign' + str(i) + args['video'].split('/')[-1] + str(frame.number) + '.jpg'
             cv2.imwrite(directory + filename, sign.sign.original)
+            cv2.imshow('sign' + str(i) + args['video'].split('/')[-1] + str(frame.number), sign.sign.original)
 
             type = mapping[type]
             value = {'filename': filename, 'type': type, 'value': sign.value, 'latitude': srt_record.latitude.replace(',', '.'), 'longtitude': srt_record.longtitude.replace(',', '.')}
             print(value)
             spamwriter.writerow(value)
             exported.append(type)
+
+            [x, y, w, h] = sign.get_position()
+
+            cv2.rectangle(frame_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+            if sign.value is not None:
+                cv2.putText(frame_image, str(sign.value), (x + 0, y + h + 30), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                            (46, 255, 0), 3)
+                cv2.putText(frame_image, "Rychlostni omezeni", (x + -120, y + h + 60), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                            (0, 50, 255), 3)
+
+            if isinstance(sign, type_sign.TypeSign) and w > 60:
+                cv2.putText(frame_image, sign.mapping[sign.type], (x - 230, y + 40), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                            (0, 50, 255), 3)
+
+            cv2.imshow("frame_image", frame_image)
+            cv2.waitKey(0)
+
+
+            last_frames = frames[8].number
 
 
 def get_value_recursive(index):
@@ -161,8 +190,8 @@ while True:
 
         [x, y, w, h] = sign.get_position()
 
-        if sign.value is not None:
-            print(str(frame.number) + ': ' + str(sign.value))
+        # if sign.value is not None:
+        #     # print(str(frame.number) + ': ' + str(sign.value))
 
     export_sign()
 

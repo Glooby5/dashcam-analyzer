@@ -17,7 +17,6 @@ k = None
 while True:
     frame = video_processor.get_next()
 
-
     if frame is False:
         break
 
@@ -25,9 +24,6 @@ while True:
 
     if frame is None:
         continue
-
-    # if frame.number % 5:
-    #     continue
 
     for sign in frame.signs:
 
@@ -41,27 +37,9 @@ while True:
             cv2.putText(frame_image, str(sign.value), (x + 0, y + h + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (46, 255, 0), 3)
             cv2.putText(frame_image, "Rychlostni omezeni", (x + -120, y + h + 60), cv2.FONT_HERSHEY_SIMPLEX, 1,
                         (0, 50, 255), 3)
-            print(str(frame.number) + ': ' + str(sign.value))
-
-            # directory = 'export2/rychlost'
-            #
-            # if not os.path.exists(directory):
-            #     os.makedirs(directory)
-            #
-            # cv2.imwrite(directory + '/sign' + args['video'].split('/')[-1] + str(frame.number) + '.jpg',
-            #             sign.sign.original)
 
         if isinstance(sign, type_sign.TypeSign) and w > 60:
             cv2.putText(frame_image, sign.mapping[sign.type], (x -230, y + 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 50, 255), 3)
-
-            # directory = 'export2/' + sign.mapping[sign.type]
-            #
-            # if not os.path.exists(directory):
-            #     os.makedirs(directory)
-            #
-            # cv2.imwrite(directory + '/sign' + args['video'].split('/')[-1] + str(frame.number) + '.jpg', sign.sign.original)
-
-        # k = cv2.waitKey(0)
 
     if len(frame.signs):
         directory = 'frame_export_2'
@@ -71,9 +49,7 @@ while True:
 
         cv2.imwrite(directory + '/frame' + str(frame.number) + '.jpg', frame_image)
 
-    # if frame.number % 10 == 0:
     cv2.imshow("frame_image", frame_image)
     k = cv2.waitKey(1)
 
-    # cv2.waitKey(0)
 cv2.destroyAllWindows()

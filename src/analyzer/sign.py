@@ -5,6 +5,7 @@ from .threshold_sign import ThresholdSign
 
 
 class Sign:
+    """ Represents general sign"""
 
     def __init__(self, image, position):
         self.original = image
@@ -14,6 +15,7 @@ class Sign:
     def crop_sign(self):
         """Tries to crop selection in sign only with interesting area"""
         threshold_sign = ThresholdSign(self.image)
+        # cv2.imshow("th", threshold_sign.get_result())
 
         im2, contours, hierarchy = cv2.findContours(threshold_sign.get_result(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -45,7 +47,7 @@ class Sign:
         result = np.bitwise_and(self.image, mask)
         result = self._concat(result, mask)
 
-        self._set_image(result[y:y + h, x:x + w])
+        self._set_image(self.image[y:y + h, x:x + w])
 
     def _set_image(self, image):
         self.image = image

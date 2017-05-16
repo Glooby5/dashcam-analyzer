@@ -4,6 +4,7 @@ from .type_sign import TypeSign
 
 
 class Frame:
+    """ Represents one frame in video """
     def __init__(self, image, number):
         self.image = image
         self.number = number

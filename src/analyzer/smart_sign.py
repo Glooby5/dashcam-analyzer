@@ -1,9 +1,12 @@
 import cv2
 from .blob import Blob
 # from blob import Blob
+from .threshold_sign import ThresholdSign
+# from threshold_sign import ThresholdSign
 
 
 class SmartSign:
+    """ Represents speed limit sign"""
 
     def __init__(self, sign, knn_model):
         self.knn_model = knn_model
@@ -13,7 +16,7 @@ class SmartSign:
         self.value = None
 
     def classify(self):
-        blobs = self._get_blobs()
+        blobs = self.get_blobs()
         blobs = sorted(blobs, key=lambda blob: blob.x)
 
         value = ""
@@ -39,7 +42,7 @@ class SmartSign:
         if self.value == 0:
             self.value = None
 
-    def _get_blobs(self):
+    def get_blobs(self):
         digit_contours, thresh = self._get_contours(self.sign.image)
         # digit_contours, thresh = self._get_contours(self.sign.original)
         blobs = []
@@ -58,8 +61,6 @@ class SmartSign:
             if percent < 20: # hotfix for irelevant contour detect
                 continue
 
-            # cv2.imshow("blob", blob_image)
-            # cv2.waitKey(0)
             blobs.append(Blob(blob_image, [x, y, w, h], self.knn_model))
 
         return blobs
@@ -93,16 +94,8 @@ class SmartSign:
     def _get_contours(self, image):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        ret, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
-        # thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 115, 1)
-
-
-        im2, contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
-
-
-        # cv2.imshow("orig", gray)
-        # cv2.imshow("th", thresh)
-        # # cv2.waitKey(0)
+        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 115, 1)
+        im2, contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
         return contours, thresh
 

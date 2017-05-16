@@ -39,6 +39,7 @@ def resizeImages(path, newWidth, newHeight):
         cv2.imwrite(path + '/' + imageFileName, resized)
 
 
-resizeImages('data/negatives', 1280, 720)
-createPositivesInfo('data/positives', 'info.dat')
+# resizeImages('cascade_test/second', 1280, 720)
+# createPositivesInfo('data/positives', 'info.dat')
 createNegativesInfo('data/negatives', 'bg.txt')
+

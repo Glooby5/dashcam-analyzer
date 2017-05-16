@@ -1,15 +1,15 @@
 import unittest
 import os
-from .. import srt_parser
-from .. import record
+from srtparser import srt_parser
+from srtparser import record
 
 
 class TestSrtParser(unittest.TestCase):
 
     def test_sample(self):
-        parser = srt_parser.SrtParser()
         file = open(os.path.dirname(__file__) + '/samples/srt_sample.srt', 'r')
-        srt_record = next(parser.parse(file))
+        parser = srt_parser.SrtParser(file)
+        srt_record = next(parser.parse())
 
         self.assertIsInstance(srt_record, record.Record)
 
@@ -18,7 +18,7 @@ class TestSrtParser(unittest.TestCase):
         self.assertEqual(srt_record.longtitude, '16,595253')
         self.assertEqual(srt_record.time, 1.383)
 
-        srt_record = next(parser.parse(file))
+        srt_record = next(parser.parse())
 
         self.assertIsInstance(srt_record, record.Record)
 

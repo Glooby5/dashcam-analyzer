@@ -9,6 +9,7 @@ MAX_WIDTH = 150
 
 
 class VideoProcessor:
+    """ Load given video and process frame by frame (detect signs, classify type and value """
     def __init__(self, cascade_file_name, video_file_name):
         self.video = cv2.VideoCapture(video_file_name)
         self.cascade = cv2.CascadeClassifier(cascade_file_name)
@@ -26,9 +27,9 @@ class VideoProcessor:
             if ret is False:
                 return False
 
-            # if self.frame_counter % 3:
-            #     self.frame_counter += 1
-            #     continue
+            if self.frame_counter % 2:
+                self.frame_counter += 1
+                continue
 
             return image
 
@@ -43,9 +44,7 @@ class VideoProcessor:
         frame.time = self.video.get(cv2.CAP_PROP_POS_MSEC) / 1000
         self.actual_frame = frame
 
-
-
-        sign_hits = self.cascade.detectMultiScale(image, scaleFactor=1.3, minNeighbors=2, minSize=(20, 20))
+        sign_hits = self.cascade.detectMultiScale(image, scaleFactor=1.2, minNeighbors=2, minSize=(20, 20))
 
         for (x, y, w, h) in sign_hits:
             if w > MAX_WIDTH or h > MAX_WIDTH:

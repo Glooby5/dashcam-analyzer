@@ -3,6 +3,7 @@ import numpy as np
 
 
 class ThresholdSign:
+    """ Represents thresholded sign"""
 
     def __init__(self, image):
         self.image = image
@@ -11,7 +12,7 @@ class ThresholdSign:
     def _create_from_image(self):
         gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
 
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(5, 5))
         cl1 = clahe.apply(gray)
 
         threshold = cv2.adaptiveThreshold(cl1, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 115, 1)
